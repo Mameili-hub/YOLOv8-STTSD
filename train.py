@@ -8,12 +8,12 @@ from ultralytics import YOLO
 
 if __name__ == '__main__':
 # Load a model
-  model = YOLO('yolov8-sttsd.yaml').load("yolov8n.pt") 
+  model = YOLO(r'yolov8-sttsd.yaml').load("yolov8n.pt") 
 
 # Predict with the model
   model.train(
     
-    data='',
+    data=r'',
     epochs=300,
     batch=16,
     amp=True,
