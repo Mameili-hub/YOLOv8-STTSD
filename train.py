@@ -8,13 +8,12 @@ from ultralytics import YOLO
 
 if __name__ == '__main__':
 # Load a model
-  #model = YOLO(r'/root/autodl-fs/ultralytics/789.yaml') # load an official model
-  model = YOLO(r'/root/autodl-fs/ultralytics/ultralytics/cfg/models/v8/yolov8.yaml').load("yolov8n.pt") 
+  model = YOLO('yolov8-sttsd.yaml').load("yolov8n.pt") 
 
 # Predict with the model
   model.train(
     
-    data=r'/root/autodl-fs/ultralytics/123.yaml',
+    data='cctsdb2021.yaml',
     epochs=300,
     batch=16,
     amp=True,
