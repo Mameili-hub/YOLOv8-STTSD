@@ -13,7 +13,7 @@ if __name__ == '__main__':
 # Predict with the model
   model.train(
     
-    data='cctsdb2021.yaml',
+    data='',
     epochs=300,
     batch=16,
     amp=True,
