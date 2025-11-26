@@ -16,7 +16,7 @@ if __name__ == '__main__':
     
     data=r'/root/autodl-fs/ultralytics/123.yaml',
     epochs=300,
-    batch=32,
+    batch=16,
     amp=True,
     workers=8,
     optimizer='SGD',
