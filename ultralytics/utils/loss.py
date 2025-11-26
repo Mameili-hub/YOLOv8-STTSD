@@ -9,6 +9,7 @@ from ultralytics.utils.ops import crop_mask, xywh2xyxy, xyxy2xywh
 from ultralytics.utils.tal import RotatedTaskAlignedAssigner, TaskAlignedAssigner, dist2bbox, dist2rbox, make_anchors
 
 from .metrics import bbox_iou, probiou
+from .metrics import bbox_iou, bbox_inner_iou
 from .tal import bbox2dist
 
 
@@ -73,7 +74,7 @@ class BboxLoss(nn.Module):
     def forward(self, pred_dist, pred_bboxes, anchor_points, target_bboxes, target_scores, target_scores_sum, fg_mask):
         """IoU loss."""
         weight = target_scores.sum(-1)[fg_mask].unsqueeze(-1)
-        iou = bbox_iou(pred_bboxes[fg_mask], target_bboxes[fg_mask], xywh=False, CIoU=True)
+        iou = bbox_inner_iou(pred_bboxes[fg_mask], target_bboxes[fg_mask], xywh=False, CIoU=True, ratio=1.1)
         loss_iou = ((1.0 - iou) * weight).sum() / target_scores_sum
 
         # DFL loss
@@ -214,7 +215,7 @@ class v8DetectionLoss:
         targets = torch.cat((batch["batch_idx"].view(-1, 1), batch["cls"].view(-1, 1), batch["bboxes"]), 1)
         targets = self.preprocess(targets.to(self.device), batch_size, scale_tensor=imgsz[[1, 0, 1, 0]])
         gt_labels, gt_bboxes = targets.split((1, 4), 2)  # cls, xyxy
-        mask_gt = gt_bboxes.sum(2, keepdim=True).gt_(0)
+        mask_gt = gt_bboxes.sum(2, keepdim=True).gt_(0.0)
 
         # Pboxes
         pred_bboxes = self.bbox_decode(anchor_points, pred_distri)  # xyxy, (b, h*w, 4)
@@ -280,7 +281,7 @@ class v8SegmentationLoss(v8DetectionLoss):
             targets = torch.cat((batch_idx, batch["cls"].view(-1, 1), batch["bboxes"]), 1)
             targets = self.preprocess(targets.to(self.device), batch_size, scale_tensor=imgsz[[1, 0, 1, 0]])
             gt_labels, gt_bboxes = targets.split((1, 4), 2)  # cls, xyxy
-            mask_gt = gt_bboxes.sum(2, keepdim=True).gt_(0)
+            mask_gt = gt_bboxes.sum(2, keepdim=True).gt_(0.0)
         except RuntimeError as e:
             raise TypeError(
                 "ERROR ❌ segment dataset incorrectly formatted or not a segment dataset.\n"
@@ -467,7 +468,7 @@ class v8PoseLoss(v8DetectionLoss):
         targets = torch.cat((batch_idx, batch["cls"].view(-1, 1), batch["bboxes"]), 1)
         targets = self.preprocess(targets.to(self.device), batch_size, scale_tensor=imgsz[[1, 0, 1, 0]])
         gt_labels, gt_bboxes = targets.split((1, 4), 2)  # cls, xyxy
-        mask_gt = gt_bboxes.sum(2, keepdim=True).gt_(0)
+        mask_gt = gt_bboxes.sum(2, keepdim=True).gt_(0.0)
 
         # Pboxes
         pred_bboxes = self.bbox_decode(anchor_points, pred_distri)  # xyxy, (b, h*w, 4)
@@ -652,7 +653,7 @@ class v8OBBLoss(v8DetectionLoss):
             targets = targets[(rw >= 2) & (rh >= 2)]  # filter rboxes of tiny size to stabilize training
             targets = self.preprocess(targets.to(self.device), batch_size, scale_tensor=imgsz[[1, 0, 1, 0]])
             gt_labels, gt_bboxes = targets.split((1, 5), 2)  # cls, xywhr
-            mask_gt = gt_bboxes.sum(2, keepdim=True).gt_(0)
+            mask_gt = gt_bboxes.sum(2, keepdim=True).gt_(0.0)
         except RuntimeError as e:
             raise TypeError(
                 "ERROR ❌ OBB dataset incorrectly formatted or not a OBB dataset.\n"

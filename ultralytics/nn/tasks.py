@@ -55,6 +55,8 @@ from ultralytics.nn.modules import (
     Segment,
     WorldDetect,
     v10Detect,
+    BiLevelRoutingAttention,
+    CARAFE,
 )
 from ultralytics.utils import DEFAULT_CFG_DICT, DEFAULT_CFG_KEYS, LOGGER, colorstr, emojis, yaml_load
 from ultralytics.utils.checks import check_requirements, check_suffix, check_yaml
@@ -811,7 +813,8 @@ def attempt_load_weights(weights, device=None, inplace=True, fuse=False):
     ensemble = Ensemble()
     for w in weights if isinstance(weights, list) else [weights]:
         ckpt, w = torch_safe_load(w)  # load ckpt
-        args = {**DEFAULT_CFG_DICT, **ckpt["train_args"]} if "train_args" in ckpt else None  # combined args
+        args = {**DEFAULT_CFG_DICT, **(ckpt.get("train_args", {}))}
+        #args = {**DEFAULT_CFG_DICT, **ckpt["train_args"]} if "train_args" in ckpt else None  # combined args
         model = (ckpt.get("ema") or ckpt["model"]).to(device).float()  # FP32 model
 
         # Model compatibility updates
@@ -933,6 +936,8 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
             PSA,
             SCDown,
             C2fCIB,
+            BiLevelRoutingAttention,
+            CARAFE,
         }:
             c1, c2 = ch[f], args[0]
             if c2 != nc:  # if c2 not equal to number of classes (i.e. for Classify() output)
@@ -959,6 +964,15 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
             c2 = args[1] if args[3] else args[1] * 4
         elif m is nn.BatchNorm2d:
             args = [ch[f]]
+        elif m is CARAFE:
+            c1, c2 = ch[f], args[0]
+            if c2 != nc:
+                c2 = make_divisible(min(c2, max_channels) * width, 8)
+            args = [c1, c2, *args[1:]]
+        elif m in [BiLevelRoutingAttention]:  
+            c2 = ch[f]
+            #args = [c2, *args[0:]]
+            args = [c2, *args]
         elif m is Concat:
             c2 = sum(ch[x] for x in f)
         elif m in {Detect, WorldDetect, Segment, Pose, OBB, ImagePoolingAttn, v10Detect}:

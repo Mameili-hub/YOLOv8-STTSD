@@ -11,7 +11,8 @@ import torch
 import torch.nn.functional as F
 
 from ultralytics.utils import LOGGER
-from ultralytics.utils.metrics import batch_probiou
+#from ultralytics.utils.metrics import batch_probiou
+
 
 
 class Profile(contextlib.ContextDecorator):
@@ -847,3 +848,5 @@ def clean_str(s):
         (str): a string with special characters replaced by an underscore _
     """
     return re.sub(pattern="[|@#!¡·$€%&()=?¿^*;:,¨´><+]", repl="_", string=s)
+
+
