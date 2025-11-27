@@ -10,5 +10,5 @@ http://cg.cs.tsinghua.edu.cn/traffic-sign/
 pip install -r requirements.txt
 # Running the Model
 python train.py
-
+python test.py
 
