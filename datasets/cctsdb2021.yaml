@@ -1,9 +1,0 @@
-# 训练/验证集路径
-path: /root/autodl-fs/ultralytics/datasets/CCTSDB2021
-train: /root/autodl-fs/ultralytics/datasets/CCTSDB2021/JPEGImages/train  
-val: /root/autodl-fs/ultralytics/datasets/CCTSDB2021/JPEGImages/val  
-test: /root/autodl-fs/ultralytics/datasets/CCTSDB2021/JPEGImages/test
-
-# 类别信息
-nc: 3  # 类别数
-names: ['prohibitory', 'warning', 'mandatory']
