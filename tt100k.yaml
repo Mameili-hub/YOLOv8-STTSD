@@ -1,8 +1,8 @@
 # 训练/验证集路径
 path: /root/autodl-fs/ultralytics/datasets/TT100K  
-train: /root/autodl-fs/ultralytics/datasets/JPEGImages/train  
-val: /root/autodl-fs/ultralytics/datasets/JPEGImages/val  
-test: /root/autodl-fs/ultralytics/datasets/JPEGImages/test
+train: /root/autodl-fs/ultralytics/datasets/TT100K/JPEGImages/train  
+val: /root/autodl-fs/ultralytics/datasets/TT100K/JPEGImages/val  
+test: /root/autodl-fs/ultralytics/datasets/TT100K/JPEGImages/test
 
 # 类别信息
 nc: 45 
